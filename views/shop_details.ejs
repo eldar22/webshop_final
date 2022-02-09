@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+    <!-- JavaScript Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+
+    <!-- CSS only -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+
+    <script src="/socket.io/socket.io.js"></script>
+
+  </head>
+  <body onload="setCustomerEmail('<%= customer %>'); statusCheck('<%= user_status.rows[0].status %>')">
+
+  <div class="row" id="shop_info_row">
+    <div class="col-2">
+      <div id="shop_photo">
+        <img src="/images/<%= shop_info.rows[0].shop_photo %>">
+      </div>
+    </div>
+    <div class="col-8" id="shop_info">
+      <p><%= shop_info.rows[0].name %></p>
+      <p><%= shop_info.rows[0].address %></p>
+      <p>Telefon</p>
+    </div>
+    <div class="col-2" id="rating">
+      <div class="rate">
+        <input type="radio" id="star5" name="rate" value="5" onclick="sendRating('5', '<%= shop_info.rows[0].name %>')"/>
+        <label for="star5" title="Ocjena 5">5 stars</label>
+        <input type="radio" id="star4" name="rate" value="4" onclick="sendRating('4', '<%= shop_info.rows[0].name %>')"/>
+        <label for="star4" title="Ocjena 4">4 stars</label>
+        <input type="radio" id="star3" name="rate" value="3" onclick="sendRating('3', '<%= shop_info.rows[0].name %>')"/>
+        <label for="star3" title="Ocjena 3">3 stars</label>
+        <input type="radio" id="star2" name="rate" value="2" onclick="sendRating('2', '<%= shop_info.rows[0].name %>')"/>
+        <label for="star2" title="Ocjena 2">2 stars</label>
+        <input type="radio" id="star1" name="rate" value="1" onclick="sendRating('1', '<%= shop_info.rows[0].name %>')"/>
+        <label for="star1" title="Ocjena 1">1 star</label>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <nav class="navbar navbar-dark bg-dark" id="shop_details_nav">
+      <div class="container-fluid">
+
+          <div class="col-1">
+            <div class="dropdown">
+              <a class="btn dropdown-toggle" href="#" role="button" id="sort_shops" data-bs-toggle="dropdown" aria-expanded="false">
+                Sortiraj
+              </a>
+
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                <li id="sort_option_A"><a class="dropdown-item" href="#"  onclick="sortShops('sorted_row_A')">A -> Z</a></li>
+                <li id="sort_option_Z"><a class="dropdown-item" href="#"  onclick="sortShops('sorted_row_Z')">Z -> A</a></li>
+              </ul>
+            </div>
+          </div>
+          <div class="col-9"></div>
+
+          <div class="dropdown col-2" id="basket">
+            <button class="btn dropdown-toggle"
+                 id="button_show_orders" data-bs-toggle="dropdown" aria-expanded="false">
+              Korpa
+            </button>
+
+            <ul class="dropdown-menu" id="order_list">
+              Korpa je prazna
+            </ul>
+          </div>
+
+      </div>
+    </nav>
+  </div>
+
+  <div class="row sorted_row" id="sorted_row_A">
+    <% for (let i = 0; i < sort_asc.length; i++){ %>
+      <div class="card col-3">
+        <img src="/images/<%= sort_asc[i].photo %>" class="card-img-top" alt="..." id="card-img">
+        <div class="card-body">
+          <h5 class="card-title"><%= sort_asc[i].product %></h5>
+          <p class="card-text">Cijena <%= sort_asc[i].price %> KM</p>
+          <button class="btn btn-primary make_order_button"
+                  onclick="makeOrder(
+                          '<%= customer %>',
+                          '<%= sort_asc[i].admin_email %>',
+                          '<%= shop_info.rows[0].name %>',
+                          '<%= sort_asc[i].product %>',
+                          '<%= sort_asc[i].photo %>');
+                          ">Dodaj u korpu</button>
+        </div>
+      </div>
+      <% if (i % 4 === 0){ %>
+        <br>
+      <%}%>
+    <%}%>
+  </div>
+
+  <div class="row sorted_row" id="sorted_row_Z">
+    <% for (let i = 0; i < sort_desc.length; i++){ %>
+      <div class="card col-3">
+        <img src="/images/<%= sort_desc[i].photo %>" class="card-img-top" alt="..." id="card-img">
+        <div class="card-body">
+          <h5 class="card-title"><%= sort_desc[i].product %></h5>
+          <p class="card-text">Cijena <%= sort_desc[i].price %> KM</p>
+          <button class="btn btn-primary make_order_button"
+                  onclick="makeOrder(
+                          '<%= customer %>',
+                          '<%= sort_desc[i].admin_email %>',
+                          '<%= shop_info.rows[0].name %>',
+                          '<%= sort_desc[i].product %>',
+                          '<%= sort_desc[i].photo %>');
+                          ">Dodaj u korpu</button>
+        </div>
+      </div>
+      <% if (i % 4 === 0){ %>
+        <br>
+      <%}%>
+    <%}%>
+  </div>
+
+  <div class="row" id="product-offer-row">
+    <% for (let i = 0; i < shops_details.rows.length; i++){ %>
+    <div class="card col-3">
+      <img src="/images/<%= shops_details.rows[i].photo %>" class="card-img-top" alt="..." id="card-img">
+      <div class="card-body">
+        <h5 class="card-title"><%= shops_details.rows[i].product %></h5>
+        <p class="card-text">Cijena <%= shops_details.rows[i].price %> KM</p>
+        <button class="btn btn-primary make_order_button"
+                onclick="makeOrder(
+                        '<%= customer %>',
+                        '<%= shops_details.rows[i].admin_email %>',
+                        '<%= shop_info.rows[0].name %>',
+                        '<%= shops_details.rows[i].product %>',
+                        '<%= shops_details.rows[i].photo %>');
+                         ">Dodaj u korpu</button>
+      </div>
+    </div>
+      <% if (i % 4 === 0){ %>
+        <br>
+      <%}%>
+    <%}%>
+  </div>
+
+  <div class="row">
+    <div>
+      <button class="btn col-3" id="chat-button" data-bs-toggle="collapse"
+              data-bs-target="#multiCollapseExample5" aria-expanded="false" aria-controls="multiCollapseExample5">
+        Chat sa trgovcem
+      </button>
+      <div class="collapse multi-collapse col-3" id="multiCollapseExample5">
+        <div class="card card-body" id="chat_window">
+          <p id="chat_header">
+            Chat sa trgovcem
+            <a href="#" id="close_chat" data-bs-target="#multiCollapseExample5" data-bs-toggle="collapse">X</a>
+          </p>
+
+          <div id="chat_text" class="overflow-auto">
+            <%for (let i = 0; i < chat_history.rows.length; i++){%>
+              <% if (chat_history.rows[i].sender !== customer){ %>
+                <p id='chat_user_2'> <%= chat_history.rows[i].mess %> </p>;
+              <%}else{%>
+                <p id='chat_user_1'> <%= chat_history.rows[i].mess %> </p>;
+              <%}%>
+            <%}%>
+          </div>
+
+          <div class="form-group" id="chat_form">
+            <textarea class="form-control" id="exampleFormControlTextarea2" rows="1" placeholder="Unesite poruku.."></textarea>
+            <button class="btn btn-primary" id="send_chat_mess_button" onclick="sendChatMessage()">Posalji</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  </body>
+
+  <script>
+    var ordered_products_list = [];
+    var del = false;
+    var socket = io.connect("ws://localhost:3000");
+    var customer_email;
+    var shop_admin_email;
+    var shop_name;
+    var num = 0;
+    $(".sorted_row").hide();
+
+    function sortShops(id){
+      document.getElementById("product-offer-row").innerHTML = document.getElementById(id).innerHTML;
+    }
+
+    function setCustomerEmail(email){
+      customer_email = email;
+    }
+
+    function makeOrder(customer, shop_admin, shop, product, photo){
+      customer_email = customer;
+      shop_admin_email = shop_admin;
+      shop_name = shop;
+      var html_li_list = [];
+      if (del === false){
+        ordered_products_list.push([shop, product]);
+      }
+
+      for (let i = 0; i < ordered_products_list.length; i++){
+        html_li_list.push(
+                "<li"+ "id='" + i + "'" + ">" + ordered_products_list[i][1]+ " " +
+                "<button class='btn btn-danger' id='del_ordered_item' onclick='delItem("+ i +")'>" + "Izbrisi" + "</button>" +
+                "</li>"+"<br>"
+        )
+      }
+
+      document.getElementById("order_list").innerHTML = "";
+      for (let i = 0; i < ordered_products_list.length; i++){
+        document.getElementById("order_list").innerHTML += html_li_list[i];
+      }
+      document.getElementById("order_list").innerHTML +=
+              "<hr>"+
+              "<li>"
+                + "<button class='btn btn-success' onclick='confirmOrder()'>" + "Potvrdi" + "</button>" + " "
+                + "<button class='btn btn-danger' onclick='cancelOrder()'>" + "Ponisti" + "</button>" +
+              "</li>";
+
+      num++;
+      document.getElementById('button_show_orders').innerText = 'Korpa(' + num + ')';
+    }
+
+    function delItem(index){
+      ordered_products_list.splice(parseInt(index), 1);
+      num-=2;
+      del = true;
+      makeOrder();
+      if (num === 0) document.getElementById("order_list").innerHTML = "Korpa je prazna";
+      del = false;
+
+    }
+
+    function confirmOrder(){
+      socket.emit("order_client", ordered_products_list);
+      num = 0;
+      document.getElementById("order_list").innerHTML = "Korpa je prazna";
+      document.getElementById('button_show_orders').innerText = 'Korpa(' + num + ')';
+
+      $.ajax({
+        method: "POST",
+        url: "/shop/details/" + shop_name,
+        data:{
+          products_list: JSON.stringify(ordered_products_list),
+          admin_email: shop_admin_email
+        },
+        success: function (data){
+          window.open(data, '_blank');
+
+        }
+
+      });
+
+      ordered_products_list = [];
+
+
+    }
+
+    function cancelOrder(){
+      num = -1;
+      makeOrder();
+      document.getElementById("order_list").innerHTML = "Korpa je prazna";
+      ordered_products_list = [];
+    }
+
+    function sendChatMessage(){
+      var mess = document.getElementById("exampleFormControlTextarea2").value;
+      document.getElementById("chat_text").innerHTML +=
+              "<p id='chat_user_1'>" + mess + "</p>";
+
+      socket.emit("customer_message_client", mess, customer_email);
+
+      document.getElementById("exampleFormControlTextarea2").value = "";
+
+    }
+
+    socket.on("shop_admin_message_server", function (data, email){
+      document.getElementById("chat_text").innerHTML +=
+              "<p id='chat_user_2'>" + data + "</p>";
+    });
+
+    function sendRating(rating, shop){
+      $.ajax({
+        method: "PUT",
+        url: "/shop/details/" + shop,
+        data: {
+          rating: rating
+        }
+      })
+    }
+
+    function statusCheck(status){
+      if (status === "arhiviran"){
+        $(".make_order_button").prop('disabled', true);
+      }
+    }
+
+  </script>
+</html>

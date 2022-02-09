@@ -1,0 +1,465 @@
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  background-image: linear-gradient(to bottom, #505453, #505453);
+  background-repeat: no-repeat;
+  min-height: 100vh;
+}
+
+a {
+  color: #00B7FF;
+}
+
+.login-page{
+
+}
+
+#to-shop-reg{
+  margin: auto;
+}
+
+#to-shop-reg a{
+  color: white;
+  text-decoration: none;
+}
+
+.shop-info{
+  margin: auto;
+}
+
+.login{
+  margin:auto;
+  border: 2px solid white;
+  border-radius: 5px;
+  padding: 20px;
+  background-color: dimgrey;
+}
+
+
+.header-shop{
+  position: fixed;
+  top:0;
+  left: 0;
+  width: 100%;
+}
+
+.most-selling{
+  background-color: transparent;
+}
+.recommended{
+  background-color: transparent;
+}
+.random-articles{
+  background-color: transparent;
+}
+
+
+.login-page{
+
+}
+
+.add-shop{
+  margin: auto;
+  border: 2px solid white;
+  background-color: gray;
+  border-radius: 5px;
+  padding: 10px;
+}
+
+.add-shop-page{
+
+}
+
+.shop-admin-page{
+
+}
+
+.accordion-body{
+  background-color: dimgray;
+}
+
+#collapse_btn{
+  background-color: gray;
+}
+
+#button_mess{
+  float: right;
+}
+
+#confirm-update{
+  float: right;
+}
+
+#user_photo{
+  height: 200px;
+  width: 200px;
+  padding: 0;
+  background-color: black;
+}
+
+#user_photo img{
+  height: 200px;
+  max-width: 200px;
+  margin: auto;
+  border: 3px solid white;
+}
+
+#user_info_row{
+  height: 20%;
+  background-color: darkgray;
+
+}
+
+#user_info{
+  margin-top: 30px;
+}
+
+#user_info_buttons{
+  float: right;
+}
+
+#user_preferences{
+  height: 300px;
+  border: 2px solid white;
+  background-color: darkgray;
+  border-radius: 5px;
+}
+
+#shop_info_row{
+  height: 20%;
+  background-color: black;
+}
+
+#shop_photo img{
+  height: 200px;
+  width: 200px;
+  margin: auto;
+  border: 3px solid white;
+}
+
+#shop_info{
+  margin-top: 30px;
+}
+
+#shop_info p{
+ color: white;
+}
+
+#product-offer-row{
+  margin-top: 20px;
+}
+
+#edit-shop-info-button{
+  float: right;
+  color: gray;
+  border: 2px solid gray;
+  border-radius: 5px;
+}
+
+.card{
+  margin-bottom: 10px;
+}
+
+#big_product_pic{
+}
+
+#big_product_pic img{
+  border: 2px solid black;
+  height: 300px;
+  width: 400px;
+}
+
+#desc{
+  margin-top: 30px;
+}
+
+#card-img{
+  max-width: 250px;
+  height: 200px;
+  margin: auto;
+}
+
+#list_of_shops_header{
+  background-color: black;
+  color: white;
+}
+
+#filter_shops{
+  color: white;
+  font-size: 15px;
+  float: right;
+}
+
+#home-img{
+  height: 300px;
+  margin: auto;
+}
+
+#home_items{
+  margin-top: 50px;
+  border: 1px solid gray;
+  border-radius: 5px;
+  background-color: white;
+}
+
+#interests_list li{
+  margin-left: 10px;
+}
+
+#button_show_orders{
+  color: white;
+}
+
+#del_ordered_item{
+  font-size: small;
+  position: absolute;
+  right: 3px;
+}
+
+.home_info{
+  color: #505453;
+  text-align: center;
+}
+
+#home_title{
+  margin-top: 10px;
+  border-bottom: 2px solid white;
+  color: white;
+  padding: 5px;
+}
+
+#chat-button{
+  position: fixed;
+  bottom: 0;
+  right: 5px;
+  background-color: rgb(37, 29, 64);
+  color: white;
+}
+#multiCollapseExample5{
+  position: fixed;
+  bottom: 0px;
+  right: 5px;
+}
+
+#close_chat{
+  text-decoration: none;
+  position: fixed;
+  right: 2%;
+  color: white;
+}
+
+#chat_text, #chat_window{
+  background-color: rgb(37, 29, 64);
+}
+
+#select_user_dropdown{
+  box-sizing: border-box;
+  padding: 10px;
+}
+
+#select_user_to_chat_button{
+  color: white;
+}
+
+
+#chat_user_2{
+  background-color: rgb(20, 81, 150);
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+#chat_text{
+  height: 250px;
+  margin-bottom: 10px;
+}
+
+#chat_user_1{
+  background-color: rgb(87, 82, 102);
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+  text-align: right;
+}
+
+#send_chat_mess_button{
+  float: right;
+}
+
+#chat_header{
+  text-align: left;
+  color: white;
+}
+
+#select_user_to_chat_button{
+  background-color: rgb(20, 81, 150);
+}
+
+
+/*https://codepen.io/hesguru/pen/BaybqXv*/
+.rate {
+  float: left;
+  height: 46px;
+  padding: 0 10px;
+}
+.rate:not(:checked) > input {
+  position:absolute;
+  top:-9999px;
+}
+.rate:not(:checked) > label {
+  float:right;
+  width:1em;
+  overflow:hidden;
+  white-space:nowrap;
+  cursor:pointer;
+  font-size:30px;
+  color:#ccc;
+}
+.rate:not(:checked) > label:before {
+  content: '★ ';
+}
+.rate > input:checked ~ label {
+  color: #ffc700;
+}
+.rate:not(:checked) > label:hover,
+.rate:not(:checked) > label:hover ~ label {
+  color: #deb217;
+}
+.rate > input:checked + label:hover,
+.rate > input:checked + label:hover ~ label,
+.rate > input:checked ~ label:hover,
+.rate > input:checked ~ label:hover ~ label,
+.rate > label:hover ~ input:checked ~ label {
+  color: #c59b08;
+}
+
+#rating{
+  margin-top: 150px;
+}
+
+#order_list{
+  padding: 10px;
+}
+
+#notification_text{
+  padding: 5px;
+  width: 250px;
+}
+
+#shop_admin_navbar{
+  position: fixed;
+  top: 0;
+  left: 0;
+  margin: auto;
+  border-bottom: 2px solid black;
+  background-color: black;
+  padding: 10px;
+  width: 100%;
+  color: white;
+
+}
+
+#shop_admin_navbar div{
+  float: right;
+}
+
+#myChart{
+  margin: auto;
+  width: 100%;
+  max-width: 700px;
+  background: black;
+}
+
+#shop_admin_updates{
+  margin: auto;
+}
+
+#header-button{
+  margin-right: 5px;
+  background-color: transparent;
+  color: white;
+}
+
+#notification_button{
+  background-color: rgb(20, 81, 150);
+  color: white;
+}
+
+#logout_button{
+  color: white;
+}
+
+#button_show_orders{
+  float: right;
+}
+
+#order_list{
+  width: 100%;
+}
+
+#collapse_btn{
+  position: static;
+}
+
+.toast{
+  position: fixed;
+  bottom: 50px;
+  right: 20px;
+}
+
+.modal_close_button{
+  background-color: transparent;
+}
+
+#system_admin_mess_input{
+  margin: auto;
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
+.user_profile_dropdown{
+  width: 100%;
+}
+
+.user_profile_dropdown_list{
+  width: 93%;
+}
+
+#user_info_row{
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
+#button_confirm_user_profile{
+  margin-left: 5px;
+}
+
+#button_cancel_user_profile{
+  margin-left: 5px;
+  font-size: 12px;
+  padding: 5px;
+}
+
+#delivered_order_button{
+  background-color: rgb(20, 81, 150);
+  color: white;
+  margin-right: 5px;
+}
+
+.confirm_delivery_button{
+  padding: 2px;
+}
+
+#sort_shops{
+  color: white;
+  font-size: 15px;
+  float: right;
+}
+
+.home-page h3{
+  text-align: center;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+

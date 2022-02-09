@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+    <!-- JavaScript Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+
+    <!-- CSS only -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+
+    <script src="/socket.io/socket.io.js"></script>
+
+  </head>
+  <body>
+
+    <div class="row" id="shop_admin_navbar">
+      <div>
+        <div class="">
+          <a href="/logout"><button type="submit" name="odjava" value="0" class="btn" id="logout_button">Odjava</button></a>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <table class="col-6" id="system_admin_mess_input">
+        <tr>
+          <td><textarea  class="form-control" id="exampleFormControlTextarea1" rows="1"
+                         placeholder="Unesite obavijest za korisnike.."></textarea></td>
+          <td>
+            <button type="submit" class="btn btn-primary"
+                      onclick="sendMessage(); clearInput()">Posalji</button>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="row">
+      <div class="accordion" id="accordionExample">
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="headingOne">
+            <button class="accordion-button" id="collapse_btn" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+              Prikaz korisnika
+            </button>
+          </h2>
+          <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+            <div class="accordion-body">
+              <h4>Prikaz korisnika</h4>
+              <table class="table table-dark table-striped" id="tabela1">
+                <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Ime</th>
+                  <th scope="col">Prezime</th>
+                  <th scope="col">Email</th>
+                  <th scope="col">Uloga</th>
+                  <th scope="col">Status</th>
+                  <th scope="col"></th>
+
+                </tr>
+                </thead>
+                <tbody>
+                <% for (let i = 0; i < user_list.rows.length; i++){ %>
+                  <tr id="<%= user_list.rows[i].email %>">
+                    <td><%=i+1%></td>
+                    <td><%= user_list.rows[i].first_name %></td>
+                    <td><%= user_list.rows[i].second_name %></td>
+                    <td><%= user_list.rows[i].email %></td>
+                    <% if (user_list.rows[i].role === 2) {%>
+                      <td>Trgovac</td>
+                    <%}else {%>
+                      <td>Kupac</td>
+                    <%}%>
+                    <td id="<%= user_list.rows[i].email %>"><%= user_list.rows[i].status %></td>
+                    <td>
+                      <button type="button" class="btn btn-primary"
+                              onclick="archivingUser(
+                                      ['<%= user_list.rows[i].first_name%>',
+                                      '<%= user_list.rows[i].second_name%>',
+                                      '<%= user_list.rows[i].address%>',
+                                      '<%= user_list.rows[i].email%>',
+                                      '<%= user_list.rows[i].password%>',
+                                      '<%= user_list.rows[i].role%>'],
+                                      '<%= user_list.rows[i].email %>')">Arhiviraj</button>
+                      <button type="button" class="btn btn-warning"
+                              onclick="blockingUser('Blokiran(15dana)', '<%= user_list.rows[i].email %>')">Blokiraj(15 dana)</button>
+                      <button type="button" class="btn btn-warning"
+                              onclick="blockingUser('Blokiran', '<%= user_list.rows[i].email %>')">Blokiraj</button>
+                      <button type="button" class="btn btn-danger"
+                              onclick="deletingUser('<%= user_list.rows[i].email %>')">Izbrisi</button>
+                    </td>
+                  </tr>
+                <%}%>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <h2 class="accordion-header" id="headingTwo">
+            <button class="accordion-button collapsed" id="collapse_btn" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#collapseTwo"
+                    aria-expanded="false" aria-controls="collapseTwo">
+              Prikaz statistike
+            </button>
+          </h2>
+          <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+            <div class="accordion-body">
+              <h4>Prikaz statistike</h4>
+              <% var shop_admins = 0; var customers = 0; var types = 0; %>
+              <table class="table table-dark table-striped">
+                <thead>
+                <tr>
+                  <th scope="col">Broj korisnika</th>
+                  <th scope="col">Broj trgovaca</th>
+                  <th scope="col">Broj kupaca</th>
+                  <th scope="col">Broj trgovina</th>
+                  <th scope="col"></th>
+                </tr>
+                </thead>
+                <tbody>
+                  <td><%= user_list.rows.length %></td>
+                  <%for (let i = 0; i < user_list.rows.length; i++){%>
+                    <% if (user_list.rows[i].role === 2){ %>
+                      <% shop_admins++; %>
+                    <%} else {%>
+                        <% if (user_list.rows[i].role === 3){ %>
+                          <% customers++; %>
+                        <%}%>
+                    <%}%>
+                  <%}%>
+                  <td><%= shop_admins %></td>
+                  <td><%= customers %></td>
+                  <td><%= shops_info.rows.length %></td>
+                  <td>
+                    <button class="btn btn-secondary" type="button"
+                              id="show_graphic_stats"
+                              data-bs-toggle="dropdown" aria-expanded="false"
+                              onclick="statisticData(
+                                      '<%= user_list.rows.length %>',
+                                      '<%= shop_admins %>',
+                                      '<%= customers %>',
+                                      '<%= shops_info.rows.length %>',
+                                      '<%= orders_stats.rows.length %>')">
+                      Grafikon
+                    </button>
+                  </td>
+                </tbody>
+              </table>
+              <table class="table table-dark table-striped">
+                <thead>
+                <tr>
+                  <th scope="col">Proizvod</th>
+                  <th scope="col">Trgovina</th>
+                  <th scope="col">Kupac</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Trgovac</th>
+                </tr>
+                </thead>
+                <tbody>
+                  <% for (let i = 0; i < orders_stats.rows.length; i++){ %>
+                    <tr>
+                      <td><%= orders_stats.rows[i].product %></td>
+                      <td><%= orders_stats.rows[i].shop %></td>
+                      <td><%= orders_stats.rows[i].customer %></td>
+                      <td><%= orders_stats.rows[i].status %></td>
+                      <td><%= orders_stats.rows[i].shop_admin %></td>
+                    </tr>
+                  <%}%>
+                </tbody>
+              </table>
+              <canvas id="myChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <button class="btn col-3" id="chat-button" data-bs-toggle="collapse"
+                data-bs-target="#multiCollapseExample5" aria-expanded="false" aria-controls="multiCollapseExample5">
+          Chat
+        </button>
+        <div class="collapse multi-collapse col-3" id="multiCollapseExample5">
+          <div class="card card-body" id="chat_window">
+
+            <div class="dropdown" id="select_user_dropdown">
+              <strong id="chat_header">Chat sa: </strong>
+              <button class="btn dropdown-toggle" type="button" id="select_user_to_chat_button" data-bs-toggle="dropdown" aria-expanded="false">
+                Izaberite
+              </button>
+
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                <% for (let i = 0; i < user_list.rows.length; i++){ %>
+                  <li><a class="dropdown-item" href="#"
+                         onclick="setChatWithEmail('<%= user_list.rows[i].email %>');">
+                      <%= user_list.rows[i].email %></a></li>
+                <%}%>
+              </ul>
+              <a href="#" id="close_chat" data-bs-target="#multiCollapseExample5" data-bs-toggle="collapse">X</a>
+            </div>
+
+            <% for (let j = 0; j < user_list.rows.length; j++){ %>
+              <div id="chat_<%= user_list.rows[j].email  %>" class="overflow-auto chat_text_class">
+                <%for (let i = 0; i < chat_history.rows.length; i++){%>
+                  <% if (chat_history.rows[i].sender === user_list.rows[j].email && chat_history.rows[i].receiver === admin){ %>
+                    <p id='chat_user_2'> <%= chat_history.rows[i].mess %> </p>;
+                  <%}else{%>
+                      <% if (chat_history.rows[i].sender === admin && chat_history.rows[i].receiver === user_list.rows[j].email){ %>
+                        <p id='chat_user_1'> <%= chat_history.rows[i].mess %> </p>;
+                      <%}%>
+                  <%}%>
+                <%}%>
+              </div>
+            <%}%>
+
+            <div id="chat_text" class="overflow-auto">
+            </div>
+
+            <div class="form-group" id="chat_form">
+              <textarea class="form-control" id="exampleFormControlTextarea2" rows="1" placeholder="Unesite poruku.."></textarea>
+              <button class="btn btn-primary" id="send_chat_mess_button" onclick="sendChatMessage('<%= admin %>')">Posalji</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+
+  </body>
+
+  <script>
+
+    var xValues = ["Ukupno korisnika", "Trgovci", "Kupci", "Trgovine", "Broj narudzbi"];
+    var yValues = [];
+    var barColors = ["red", "green","blue","orange", "white"];
+    var hide_chart = 1;
+    $("#myChart").hide();
+    var chat_with = "";
+    var socket = io.connect("ws://localhost:3000")
+    $(".chat_text_class").hide();
+
+    function statisticData(users, shop_admins, customers, shops, orders){
+      if (hide_chart % 2 !== 0){
+        $("#myChart").show();
+      }else{
+        $("#myChart").hide();
+      }
+      hide_chart++;
+      yValues = [users, shop_admins, customers, shops, orders, 0];
+      new Chart("myChart", {
+        type: "bar",
+        data: {
+          labels: xValues,
+          datasets: [{
+            backgroundColor: barColors,
+            data: yValues
+          }]
+        },
+        options: {
+          legend: {display: false},
+          title: {
+            display: true,
+            text: "Statistika stranice"
+          }
+        }
+      });
+    }
+
+    function getData(){
+      $.ajax({
+        url: "/system/admin",
+        method: "GET",
+      })
+    }
+
+    function blockingUser(status, email){
+      $.ajax({
+        url: "/system/admin",
+        method: "PUT",
+        data:{
+          status_ajax: status,
+          email_ajax: email
+        },
+        success: document.getElementById(email).innerText = status
+
+      })
+    }
+    function deletingUser(email){
+      $.ajax({
+        url: "/system/admin",
+        method: "DELETE",
+        data:{
+          email_ajax: email
+        }
+
+      })
+
+      document.getElementById(email).remove();
+    }
+
+    function archivingUser(list, email){
+      $.ajax({
+        url: "/system/admin",
+        method: "POST",
+        data:{
+          first_name_ajax: list[0],
+          second_name_ajax: list[1],
+          address_ajax: list[2],
+          email_ajax: list[3],
+          pass_ajax: list[4],
+          role_ajax: list[5]
+        }
+      })
+      document.getElementById(email).remove();
+    }
+
+    function sendMessage(){
+
+      socket.emit("notification_from_admin_client", document.getElementById('exampleFormControlTextarea1').value);
+
+    }
+
+    function clearInput(){
+      $('#exampleFormControlTextarea1').val("");
+    }
+
+    function setChatWithEmail(email){
+      chat_with = email;
+      var id = "chat_" + email;
+      document.getElementById("select_user_to_chat_button").innerText= email;
+
+      document.getElementById("chat_text").innerHTML = document.getElementById(id).innerHTML;
+
+      //$("#chat_text").html(document.getElementById(id));
+      //console.log(document.getElementById(id).innerHTML);
+      //console.log(document.getElementById("1").innerText);
+      //document.getElementById("chat_text").innerHTML = "";
+    }
+
+
+
+    function sendChatMessage(admin){
+      var mess = document.getElementById("exampleFormControlTextarea2").value;
+      document.getElementById("chat_text").innerHTML +=
+              "<p id='chat_user_1'>" + mess + "</p>";
+
+      socket.emit("system_admin_message_client", mess, chat_with, admin);
+
+      document.getElementById("exampleFormControlTextarea2").value = "";
+    }
+
+    socket.on("home_message_server", function (data, email){
+      if (chat_with === email){
+        document.getElementById("chat_text").innerHTML +=
+                "<p id='chat_user_2'>" + data + "</p>";
+      }
+    });
+
+    socket.on("shop_admin_message_server", function (data, email){
+      console.log(data, " ", email)
+      if (chat_with === email){
+        document.getElementById("chat_text").innerHTML +=
+                "<p id='chat_user_2'>" + data + "</p>";
+      }
+    });
+
+  </script>
+</html>

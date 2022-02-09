@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+    <!-- JavaScript Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+
+    <!-- CSS only -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+
+
+    <header class="row" id="list_of_shops_header">
+      <div class="col-9">
+        <h3>Lista svih trgovina</h3>
+      </div>
+
+      <div class="col-2">
+        <div class="dropdown">
+          <a class="btn dropdown-toggle" href="#" role="button" id="filter_shops" data-bs-toggle="dropdown" aria-expanded="false">
+            Filtriraj
+          </a>
+
+          <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+            <li id="all"><a class="dropdown-item" href="#"  onclick="filterShops('0')">Sve</a></li>
+            <li id="cars"><a class="dropdown-item" href="#"  onclick="filterShops('1')">Automobili</a></li>
+            <li id="tech"><a class="dropdown-item" href="#"  onclick="filterShops('4')">Tehnologija</a></li>
+            <li id="sport"><a class="dropdown-item" href="#"  onclick="filterShops('3')">Sportska oprema</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="col-1">
+        <div class="dropdown">
+          <a class="btn dropdown-toggle" href="#" role="button" id="sort_shops" data-bs-toggle="dropdown" aria-expanded="false">
+            Sortiraj
+          </a>
+
+          <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+            <li id="sort_option_A"><a class="dropdown-item" href="#"  onclick="sortShops('sorted_row_A')">A -> Z</a></li>
+            <li id="sort_option_Z"><a class="dropdown-item" href="#"  onclick="sortShops('sorted_row_Z')">Z -> A</a></li>
+          </ul>
+        </div>
+      </div>
+    </header>
+  </head>
+  <body>
+
+    <div class="row" id="product-offer-row">
+      <% for (let i = 0; i < shops_list.rows.length; i++){ %>
+        <div class="card col-3">
+          <img src="/images/<%= shops_list.rows[i].shop_photo %>" class="card-img-top" alt="..." id="card-img">
+          <div class="card-body">
+            <h5 class="card-title"><%= shops_list.rows[i].name %></h5>
+            <a class="btn btn-primary" href="/shop/details/<%= shops_list.rows[i].name %>"
+               onclick="shopDetails('<%= shops_list.rows[i].name %>')">Pogledaj ponudu</a>
+          </div>
+        </div>
+        <% if (i % 4 === 0){ %>
+          <br>
+        <%}%>
+      <%}%>
+    </div>
+
+    <div class="row sorted_row" id="sorted_row_A">
+      <% for (let i = 0; i < sort_asc.length; i++){ %>
+        <div class="card col-3">
+          <img src="/images/<%= sort_asc[i].shop_photo %>" class="card-img-top" alt="..." id="card-img">
+          <div class="card-body">
+            <h5 class="card-title"><%= sort_asc[i].name %></h5>
+            <a class="btn btn-primary" href="/shop/details/<%= sort_asc[i].name %>"
+               onclick="shopDetails('<%= sort_asc[i].name %>')">Pogledaj ponudu</a>
+          </div>
+        </div>
+        <% if (i % 4 === 0){ %>
+          <br>
+        <%}%>
+      <%}%>
+    </div>
+
+    <div class="row sorted_row" id="sorted_row_Z">
+      <% for (let i = 0; i < sort_desc.length; i++){ %>
+        <div class="card col-3">
+          <img src="/images/<%= sort_desc[i].shop_photo %>" class="card-img-top" alt="..." id="card-img">
+          <div class="card-body">
+            <h5 class="card-title"><%= sort_desc[i].name %></h5>
+            <a class="btn btn-primary" href="/shop/details/<%= sort_desc[i].name %>"
+               onclick="shopDetails('<%= sort_desc[i].name %>')">Pogledaj ponudu</a>
+          </div>
+        </div>
+        <% if (i % 4 === 0){ %>
+          <br>
+        <%}%>
+      <%}%>
+    </div>
+
+    <div class="row filtered_row" id="0">
+      <% for (let i = 0; i < shops_list.rows.length; i++){ %>
+        <div class="card col-3">
+          <img src="/images/<%= shops_list.rows[i].shop_photo %>" class="card-img-top" alt="..." id="card-img">
+          <div class="card-body">
+            <h5 class="card-title"><%= shops_list.rows[i].name %></h5>
+            <a class="btn btn-primary" href="/shop/details/<%= shops_list.rows[i].name %>"
+               onclick="shopDetails('<%= shops_list.rows[i].name %>')">Pogledaj ponudu</a>
+          </div>
+        </div>
+        <% if (i % 4 === 0){ %>
+          <br>
+        <%}%>
+      <%}%>
+    </div>
+
+  <% for (let j = 0; j < shop_types.rows.length; j++){ %>
+    <div class="row filtered_row" id="<%= shop_types.rows[j].id %>">
+      <% for (let i = 0; i < shops_list.rows.length; i++){ %>
+        <% if (shops_list.rows[i].type === shop_types.rows[j].id){ %>
+          <div class="card col-3">
+            <img src="/images/<%= shops_list.rows[i].shop_photo %>" class="card-img-top" alt="..." id="card-img">
+            <div class="card-body">
+              <h5 class="card-title"><%= shops_list.rows[i].name %></h5>
+              <a class="btn btn-primary" href="/shop/details/<%= shops_list.rows[i].name %>">Pogledaj ponudu</a>
+            </div>
+          </div>
+        <%}%>
+        <% if (i % 4 === 0){ %>
+          <br>
+        <%}%>
+      <%}%>
+    </div>
+  <%}%>
+
+  </body>
+
+  <script>
+    $(".filtered_row").hide();
+    $(".sorted_row").hide();
+    /*function filterShops(type){
+      $.ajax({
+        method: "GET",
+        url: "/shop/list/" + type
+      })
+    }*/
+
+    function shopDetails(name){
+      $.ajax({
+        method: "GET",
+        url: "/shop/details/" + name,
+      })
+    }
+
+    function filterShops(id){
+      document.getElementById("product-offer-row").innerHTML = document.getElementById(id).innerHTML;
+    }
+
+    function sortShops(id){
+      document.getElementById("product-offer-row").innerHTML = document.getElementById(id).innerHTML;
+    }
+
+  </script>
+</html>

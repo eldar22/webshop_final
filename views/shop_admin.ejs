@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+    <!-- JavaScript Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+
+    <!-- CSS only -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+
+    <script src="/socket.io/socket.io.js"></script>
+  </head>
+
+  <body>
+
+
+    <div class="row" id="shop_admin_navbar">
+      <div>
+        <div class="">
+          <a href="/logout"><button type="submit" name="odjava" value="0" class="btn" id="logout_button">Odjava</button></a>
+        </div>
+
+        <div class="">
+
+          <a href="#collapseExample" data-bs-toggle="collapse" aria-expanded="false" aria-controls="collapseExample">
+            <button id="header-button" type="submit" class="btn">
+              Poruke administratora</button></a>
+
+
+          <button class="btn" id="header-button" type="button"  onclick="$('#modal_1').modal('show')">
+            Dodaj proizvod
+          </button>
+
+          <button class="btn" id="header-button" type="button"  onclick="$('#modal_2').modal('show')">
+            Uredi podatke o trgovini
+          </button>
+
+          <div class="dropdown" id="button_notificaton">
+            <button class="btn dropdown-toggle" type="button" id="notification_button" data-bs-toggle="dropdown" aria-expanded="false">
+              Narudzbe
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1" id="notification_text">
+              <% for (let i = 0; i < orders.rows.length; i++){ %>
+                <% if (orders.rows[i].status === ""){ %>
+                  <p id="<%= orders.rows[i].id %>"> <%= orders.rows[i].shop %>,<%= orders.rows[i].product %> <br>
+                    <button class='btn btn-success'
+                            onclick="setStatus('<%= orders.rows[i].id %>', 'Odobreno', '<%= orders.rows[i].product %>')">Prihvati</button>
+                    <button class='btn btn-danger'
+                            onclick="setStatus('<%= orders.rows[i].id %>', 'Odbijeno', '<%= orders.rows[i].product %>')">Odbij</button>
+                  </p>
+                <%}%>
+              <%}%>
+              <hr>
+              <p><button class="btn btn-success" onclick="confirmStatus('<%= products.rows[0].admin_email %>')" >Potvrdi</button></p>
+            </ul>
+          </div>
+
+          <div class="dropdown" id="button_notificaton">
+            <button class="btn dropdown-toggle" type="button" id="delivered_order_button" data-bs-toggle="dropdown" aria-expanded="false">
+              Odobreno
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1" id="notification_text">
+              <% for (let i = 0; i < orders.rows.length; i++){ %>
+                <% if (orders.rows[i].status === "Odobreno"){ %>
+                  <p id="<%= orders.rows[i].id %>"> <%= orders.rows[i].shop %>,<%= orders.rows[i].product %> <br>
+                    <button class='btn btn-success'
+                            onclick="setStatus(
+                                    '<%= orders.rows[i].id %>', 'Isporuceno', '<%= orders.rows[i].product %>')"
+                    >Isporuceno</button>
+                  </p>
+                <%}%>
+              <%}%>
+              <hr>
+              <p><button class="btn btn-success" onclick="confirmStatus('<%= products.rows[0].admin_email %>')" >Potvrdi</button></p>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <div class="modal fade" id="modal_1" tabindex="-1" role="dialog" aria-labelledby="exampleModalScrollableTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalScrollableTitle">Dodaj proizvod</h5>
+            <button type="button" class="btn" data-dismiss="modal" aria-label="Close" onclick="$('#modal_1').modal('hide')">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form method="post" id="add-product-form" encType="multipart/form-data">
+              <div class="mb-3">
+                <label for="product_name">Naziv proizvoda</label>
+                <input type="text" class="form-control" id="product_name" name="product_name">
+              </div>
+              <div>
+                <label for="product_type">Tip proizvoda</label>
+                <select class="form-select form-select-md mb-3" aria-label=".form-select-lg example" id="product_type" name="product_type">
+                  <option selected value="1">Namirnice</option>
+                  <option value="2">Odjeca</option>
+                  <option value="3">Sportska oprema</option>
+                  <option value="4">Tehnika</option>
+                  <option value="5">Automobil</option>
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="image">Fotografija</label>
+                <input type="file" class="form-control" id="image" name="image">
+              </div>
+              <div class="mb-3">
+                <label for="product_price" class="form-label">Cijena</label>
+                <input type="number" class="form-control" id="product_price" name="product_price">
+              </div>
+              <div class="mb-3">
+                <label for="product_quantity" class="form-label">Kolicina</label>
+                <input type="number" class="form-control" id="product_quantity" name="product_quantity">
+              </div>
+              <div>
+                <label for="shop_name">Izaberite trgovinu</label>
+                <select class="form-select form-select-md mb-3" aria-label=".form-select-lg example" id="shop_name" name="shop_name">
+                  <option selected value="<%= shops.rows[0].name %>"><%= shops.rows[0].name %></option>
+                  <% for (let i = 1; i < shops.rows.length; i++){ %>
+                    <option value="<%= shops.rows[i].name %>"><%= shops.rows[i].name %></option>
+                  <%}%>
+                </select>
+              </div>
+
+              <button type="submit" class="btn btn-primary" onclick="">Dodaj</button>
+
+            </form>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="modal_2" tabindex="-1" role="dialog" aria-labelledby="exampleModalScrollableTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalScrollableTitle">Uredi podatke o trgovini</h5>
+            <button type="button" class="btn modal_close_button" data-dismiss="modal" aria-label="Close" onclick="$('#modal_2').modal('hide')">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form method="post" id="add-product-form" encType="multipart/form-data">
+              <div class="mb-3">
+                <label for="update_shop_name">Naziv trgovine</label>
+                <input type="text" class="form-control update-shop-field" id="update_shop_name" name="update_shop_name">
+              </div>
+              <div class="mb-3">
+                <label for="update_shop_type">Tip trgovine</label>
+                <input type="number" class="form-control update-shop-field" id="update_shop_type" name="update_shop_type">
+              </div>
+              <div class="mb-3">
+                <label for="update_shop_address" class="form-label">Adresa</label>
+                <input type="text" class="form-control update-shop-field" id="update_shop_address" name="update_shop_address">
+              </div>
+              <div class="mb-3">
+                <label for="image" class="form-label">Fotografija</label>
+                <input type="file" class="form-control update-shop-field" id="image" name="image">
+              </div>
+              <div>
+                <label for="update_shop">Izaberite trgovinu</label>
+                <select class="form-select form-select-md mb-3" aria-label=".form-select-lg example" id="update_shop" name="update_shop">
+                  <option selected value="<%= shops.rows[0].name %>"><%= shops.rows[0].name %></option>
+                  <% for (let i = 1; i < shops.rows.length; i++){ %>
+                    <option value="<%= shops.rows[i].name %>"><%= shops.rows[i].name %></option>
+                  <%}%>
+                </select>
+              </div>
+
+              <button type="submit" class="btn btn-primary" onclick="">Potvrdi</button>
+
+            </form>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="collapse" id="collapseExample">
+
+      <table class="col-6" id="system_admin_mess_input">
+        <tr>
+          <td><textarea  class="form-control" id="exampleFormControlTextarea1" rows="1"
+                         placeholder="Obavijest od administratora.."></textarea></td>
+        </tr>
+      </table>
+
+    </div>
+
+    <div class="toast">
+      <div class="toast-header">
+        Upravo naruceni:
+      </div>
+      <div class="toast-body">
+
+      </div>
+    </div>
+
+    <br>
+
+  <div class="row">
+    <div class="accordion" id="accordionExample">
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="headingOne">
+          <button class="accordion-button" id="collapse_btn" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+            Prikaz vasih trgovina
+          </button>
+        </h2>
+        <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+          <div class="accordion-body">
+
+            <table class="table table-striped table-dark" id="update_table">
+              <thead>
+                <th scope="col" id="shop"></th>
+                <th scope="col" id="product"></th>
+                <th scope="col"></th>
+                <th scope="col"></th>
+                <!--<th scope="col"></th>-->
+              </thead>
+              <tbody>
+
+                <tr id="updateRow">
+                  <td>
+                    <div class="mb-3">
+                      <label for="update_name">Naziv proizvoda</label>
+                      <input type="text" class="form-control update-field" id="update_name" name="update_name">
+                    </div>
+                  </td>
+                  <td>
+                    <div class="mb-3">
+                      <label for="update_quantity">Kolicina</label>
+                      <input type="number" class="form-control update-field" id="update_quantity" name="update_quantity">
+                    </div>
+                  </td>
+                  <td>
+                    <div class="mb-3">
+                      <label for="update_price">Cijena</label>
+                      <input type="number" class="form-control update-field" id="update_price" name="update_price">
+                    </div>
+                  </td>
+                  <td>
+                    <div class="mb-3">
+                      <label for="update_type">Tip</label>
+                      <input type="number" class="form-control update-field" id="update_type" name="update_type">
+                    </div>
+                  </td>
+                </tr>
+
+                <tr>
+
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td>
+                    <button id="confirm-update" type="submit" class="btn btn-primary" onclick="updateProduct([
+                          document.getElementById('update_name').value,
+                          document.getElementById('update_quantity').value,
+                          document.getElementById('update_price').value,
+                          document.getElementById('update_type').value,
+                    ], '<%= products.rows[0].admin_email %>')">Potvrdi promjenu</button>
+                  </td>
+
+                </tr>
+              </tbody>
+            </table>
+            <table class="table table-dark table-striped">
+              <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Naziv trgovine</th>
+                <th scope="col">Proizvod</th>
+                <th scope="col">Kolicina</th>
+                <th scope="col">Cijena</th>
+                <th scope="col">Tip</th>
+                <th scope="col"></th>
+
+              </tr>
+              </thead>
+              <tbody>
+              <% for (let i = 0; i < products.rows.length; i++){ %>
+                <tr id="<%= products.rows[i].product %>">
+                  <td><%=i+1%></td>
+                  <td><%= products.rows[i].shop_name %></td>
+                  <td><%= products.rows[i].product %></td>
+                  <td><%= products.rows[i].quantity %></td>
+                  <td><%= products.rows[i].price %></td>
+                  <td><%= products.rows[i].type %></td>
+                  <td>
+                    <button  type="button" class="btn btn-primary" id="update_button"
+                             onclick="setProductName(
+                                     '<%= products.rows[i].product %>',
+                                     '<%= products.rows[i].shop_name %>'); ">Uredi</button>
+                    <button type="button" class="btn btn-danger"
+                            onclick="deletingProduct('<%= products.rows[i].product %>',
+                                    '<%= products.rows[0].admin_email %>')">Izbrisi</button>
+                  </td>
+
+                </tr>
+              <%}%>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="headingOne">
+          <button class="accordion-button" id="collapse_btn" type="button"
+                  data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+            Prikaz narudzbi
+          </button>
+        </h2>
+        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+          <div class="accordion-body">
+            <table class="table table-dark table-striped">
+              <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Proizvod</th>
+                <th scope="col">Trgovina</th>
+                <th scope="col">Kupac</th>
+                <th scope="col">Status</th>
+              </tr>
+              </thead>
+              <tbody>
+              <% for (let i = 0; i < orders.rows.length; i++){ %>
+                <tr>
+
+                  <td><%=i+1%></td>
+                  <td><%= orders.rows[i].product %></td>
+                  <td><%= orders.rows[i].shop %></td>
+                  <td><%= orders.rows[i].customer %></td>
+                  <td><%= orders.rows[i].status %></td>
+
+                </tr>
+              <%}%>
+              </tbody>
+            </table>
+            <hr>
+            <p>Ukupna zarada u KM:</p>
+            <% for (let i = 0; i < income.rows.length; i++){%>
+              <li><%= income.rows[i].profit %></li>
+            <%}%>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="row">
+    <div>
+      <button class="btn col-3" id="chat-button" data-bs-toggle="collapse"
+              data-bs-target="#multiCollapseExample5" aria-expanded="false" aria-controls="multiCollapseExample5">
+        Chat
+      </button>
+      <div class="collapse multi-collapse col-3" id="multiCollapseExample5">
+        <div class="card card-body" id="chat_window">
+
+          <div class="dropdown" id="select_user_dropdown">
+            <strong id="chat_header">Chat sa: </strong>
+            <button class="btn dropdown-toggle" type="button" id="select_user_to_chat_button" data-bs-toggle="dropdown" aria-expanded="false">
+              Izaberite
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+              <% for (let i = 0; i < chat_users.rows.length; i++){ %>
+                <li><a class="dropdown-item" href="#"
+                       onclick="setChatWithEmail('<%= chat_users.rows[i].email %>')"><%= chat_users.rows[i].email %></a></li>
+              <%}%>
+            </ul>
+            <a href="#" id="close_chat" data-bs-target="#multiCollapseExample5" data-bs-toggle="collapse">X</a>
+          </div>
+
+          <% for (let j = 0; j < chat_users.rows.length; j++){ %>
+            <div id="chat_<%= chat_users.rows[j].email  %>" class="overflow-auto chat_text_class">
+              <%for (let i = 0; i < chat_history.rows.length; i++){%>
+                <% if (chat_history.rows[i].sender === chat_users.rows[j].email &&
+                        chat_history.rows[i].receiver === products.rows[0].admin_email){ %>
+                  <p id='chat_user_2'> <%= chat_history.rows[i].mess %> </p>;
+                <%}else{%>
+                  <% if (chat_history.rows[i].sender === products.rows[0].admin_email &&
+                          chat_history.rows[i].receiver === chat_users.rows[j].email){ %>
+                    <p id='chat_user_1'> <%= chat_history.rows[i].mess %> </p>;
+                  <%}%>
+                <%}%>
+              <%}%>
+            </div>
+          <%}%>
+
+          <div id="chat_text" class="overflow-auto">
+          </div>
+
+          <div class="form-group" id="chat_form">
+            <textarea class="form-control" id="exampleFormControlTextarea2" rows="1" placeholder="Unesite poruku.."></textarea>
+            <button class="btn btn-primary" id="send_chat_mess_button" onclick="sendChatMessage()">Posalji</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  </body>
+
+  <script>
+    var product_name;
+    var shop_name;
+    var hide_update = 1;
+    var chat_with = "";
+    var status_set_list = [];
+    $("#update_table").hide();
+    $(".chat_text_class").hide();
+
+    var socket = io.connect("ws://localhost:3000");
+
+
+    socket.on("order_server", function (data){
+      var toast_text = "";
+      for (let i = 0; i < data.length; i++){
+        /*document.getElementById("notification_text").innerHTML +=
+                "<p>" +
+                  data[i] + "<br>" +
+                  "<button class='btn btn-success' onclick='setStatus()'>" + "Prihvati" + "</button>"+ " " +
+                  "<button class='btn btn-danger' onclick='setStatus()'>" + "Odbij" + "</button>" +
+                "</p>";*/
+        toast_text += "<p>" + data[i] + "</p>";
+      }
+      $('.toast-body').html(toast_text);
+      $('.toast').toast('show');
+    });
+
+
+    function addProduct(){
+      alert("Proizvod je dodan!");
+      //document.getElementById("add-product-form").reset();
+      window.location.reload();
+    }
+
+    function getMess(email){
+      $.ajax({
+        method: "POST",
+        url: "/shop/admin/" + email,
+        success: function (data){
+            //$("#button_mess").html("Poruke(1)");
+            $("#mess_text").html("<p>" + "Admin sistema:" + "<br>" + data + "<br>" + '<button class="btn btn-primary"  onclick="clearMess()">Obrisi</button>' + "</p>");
+        }
+      })
+    }
+
+    function clearMess(){
+      //$("#button_mess").html("Poruke");
+      $("#mess_text").html("<p>" + "Nemate poruka" + "<br>" + '<button class="btn btn-primary"  onclick="clearMess()">Obrisi</button>' + "</p>");
+    }
+
+
+    function deletingProduct(product, email){
+      $.ajax({
+        url: "/shop/admin/" + email,
+        method: "DELETE",
+        data:{
+          ajax_product: product
+        }
+
+      })
+
+      document.getElementById(product).remove();
+    }
+
+
+    function setProductName(product, shop){
+      product_name = product;
+      shop_name = shop;
+      $("#shop").html(shop);
+      $("#product").html(product);
+      if (hide_update % 2 !== 0){
+        $("#update_table").show();
+        $("#updateRow").show("slow");
+      }else{
+        $("#update_table").hide();
+        $("#updateRow").hide("slow");
+      }
+
+      hide_update += 1;
+    }
+
+    function updateProduct(list, email){
+      $.ajax({
+        url: "/shop/admin/" + email,
+        method: "PUT",
+        data:{
+          update_product: product_name,
+          product_name: list[0],
+          product_quantity: list[1].toString(),
+          product_price: list[2].toString(),
+          product_type: list[3].toString(),
+          update_shop: shop_name
+        }
+      })
+      $(".update-field").val("");
+    }
+
+    function setStatus(product_id, status, name){
+      status_set_list.push([product_id, status]);
+
+      document.getElementById(product_id.toString()).innerText = name;
+      if (status === "Odobreno" || status === "Isporuceno"){
+        document.getElementById(product_id.toString()).style = "color: green";
+      }else {
+        document.getElementById(product_id.toString()).style = "color: red";
+      }
+
+    }
+
+    function confirmStatus(shop_admin_email){
+      $.ajax({
+        method: "PUT",
+        url: "/shop/admin/" + shop_admin_email,
+        data: {
+          status_list: JSON.stringify(status_set_list)
+        }
+      })
+
+      /*for (let i = 0; i < status_set_list.length; i++){
+        document.getElementById(status_set_list[i][0].toString()).remove();
+      }*/
+      status_set_list = [];
+      document.getElementById("notification_text").innerText = "Nemate novih narudzbi";
+    }
+
+    function updateShop(){
+      alert("Promjene su sacuvane!")
+      window.location.reload();
+    }
+
+    function setChatWithEmail(email){
+      chat_with = email;
+      var id = "chat_" + email;
+      document.getElementById("select_user_to_chat_button").innerText= email;
+
+      document.getElementById("chat_text").innerHTML = document.getElementById(id).innerHTML;
+
+      //document.getElementById("chat_text").innerHTML = "";
+    }
+
+    function sendChatMessage(){
+      var mess = document.getElementById("exampleFormControlTextarea2").value;
+      document.getElementById("chat_text").innerHTML +=
+              "<p id='chat_user_1'>" + mess + "</p>";
+
+      socket.emit("shop_admin_message_client", mess, chat_with);
+
+      document.getElementById("exampleFormControlTextarea2").value = "";
+    }
+
+    socket.on("notification_from_admin_server", function (data){
+      document.getElementById("exampleFormControlTextarea1").value = data;
+    });
+
+    socket.on("customer_message_server", function (data, email){
+      if (chat_with === email){
+        document.getElementById("chat_text").innerHTML +=
+                "<p id='chat_user_2'>" + data + "</p>";
+      }
+    });
+
+    socket.on("system_admin_message_server", function (data, email){
+      if (chat_with === email){
+        document.getElementById("chat_text").innerHTML +=
+                "<p id='chat_user_2'>" + data + "</p>";
+      }
+    });
+
+
+  </script>
+</html>
