@@ -231,7 +231,7 @@ router.post('/shop/registration', upload.single('image'),function(req, res, next
                 [shop.name, shop.type, shop.location, shop.admin, shop.image], (err) => {
                   done();
                   if (err) {
-                    res.send("Ovaj naziv vec postoji!");//Javlja mi i kad se desi unos
+                    res.send("Ovaj naziv vec postoji!");
                     return err;
                   }else {
                     client.query( "update users set role = 2 where email = $1", [shop.admin], function (err, data_1){
@@ -418,7 +418,7 @@ router.get('/system/admin', function(req, res, next) {
 
               //client.join("room1");
 
-              if (create_socket_event === true){//ova provjera je tu da mi u chatu s kupcem duple poruke ne salje a s trgovcem ne salje nikako
+              if (create_socket_event === true){
                 client_s.on("system_admin_message_client", function (data, email, admin){
                   for (let i = 0; i < socket_clients_list.length; i++){
                     if (socket_clients_list[i][0] === email){
@@ -599,8 +599,6 @@ router.get('/shop/admin/:email', function(req, res, next) {
             io.sockets.on("connection", function (client_s){
 
               socket_clients_list.push([user_email, client_s.id]);
-
-              //client.join("room1");
 
               client_s.on("system_admin_message_client", function (data, email, admin){
                 for (let i = 0; i < socket_clients_list.length; i++){
@@ -877,8 +875,6 @@ router.get('/shop/details/:name', function(req, res, next) {
 
               socket_clients_list.push([user_email, client_s.id]);
 
-              //client.join("room1");
-
               client_s.on("system_admin_message_client", function (data, email, admin){
                 for (let i = 0; i < socket_clients_list.length; i++){
                   if (socket_clients_list[i][0] === email){
@@ -983,7 +979,6 @@ router.get('/shop/details/:name', function(req, res, next) {
 });
 
 router.post('/shop/details/:name', function(req, res, next) {
-  //order_notification.push(req.body.order_product_name) ;
   var products_list = JSON.parse(req.body.products_list);
   var insert_query_string = "insert into orders (product, shop, customer, status, shop_admin) values";
 
@@ -1180,7 +1175,7 @@ router.delete('/user/profile/:email', function(req, res, next) {
 
 router.get('/logout', function(req, res, next) {
   res.clearCookie("user");
-  res.redirect(req.get('referer'));//da mi reloada stranicu da mi se ne moze vise vratit sa back dugmetom kad se odjavi
+  res.redirect(req.get('referer'));
 });
 
 
