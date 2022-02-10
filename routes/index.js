@@ -22,7 +22,7 @@ var socket_clients_list = [];
 
 config = {
   user: 'uvngbtec',
-  password: 'p4gDYKaNHKBwV0Opfd-E2u0UVcKR9Gmh',
+  password: 'xxxxxxxxxxxx',
   host: 'surus.db.elephantsql.com',
   port: 5432,
   database: 'uvngbtec',
